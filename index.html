@@ -16,6 +16,14 @@
       --purple-mid: #a47ba8;
     }
 
+    /* Trava de Seleção de Texto */
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
     body {
       background-color: #0d0714;
       color: #ffffff;
@@ -68,9 +76,40 @@
       background-color: var(--light-pink);
       border-radius: 2px;
     }
+
+    /* Estilo do Rastro do Cursor */
+    .cursor-particle {
+      position: fixed;
+      pointer-events: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--light-pink);
+      box-shadow: 0 0 10px var(--light-pink), 0 0 20px var(--purple-mid);
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      animation: particleFade 0.8s linear forwards;
+    }
+
+    @keyframes particleFade {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2);
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 relative">
+
+  <!-- AVISO DE ACESSO PROIBIDO -->
+  <div id="forbidden-alert" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-[var(--deep-purple)]/90 border border-[var(--light-pink)] text-[var(--light-pink)] px-6 py-3 rounded-2xl shadow-2xl backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 font-mono text-xs uppercase tracking-widest">
+    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+    <span>Acesso Proibido</span>
+  </div>
 
   <!-- TELA INICIAL (START SCREEN) -->
   <div id="start-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 transition-opacity duration-1000 ease-in-out px-4 text-center">
@@ -211,8 +250,8 @@
 
           <div class="flex-1 w-full min-w-0">
             <div class="mb-4">
-              <h3 id="song-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-[var(--light-pink)] to-white truncate">Stressed Out</h3>
-              <p id="artist-name" class="text-xs text-[var(--purple-mid)] font-medium mt-1">Twenty One Pilots</p>
+              <h3 id="song-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-[var(--light-pink)] to-white truncate">Favorite Song</h3>
+              <p id="artist-name" class="text-xs text-[var(--purple-mid)] font-medium mt-1">Toosii</p>
             </div>
             <div class="w-full bg-[var(--deep-purple)]/50 rounded-full h-1 mb-2 cursor-pointer group tap-area border border-[var(--light-pink)]/10" id="progress-container">
               <div id="progress-bar" class="bg-gradient-to-r from-[var(--purple-mid)] to-[var(--light-pink)] h-1 rounded-full w-0 relative group-hover:h-1.5 transition-all duration-300"></div>
@@ -235,7 +274,8 @@
           </div>
         </div>
 
-        <audio id="audio-player" ontimeupdate="updateProgress()" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"></audio>
+        <!-- MÚSICA DO DROPBOX -->
+        <audio id="audio-player" ontimeupdate="updateProgress()" src="https://www.dropbox.com/scl/fi/90jrl848zrgphx9wltzi6/Toosii-Favorite-Song.mp3?rlkey=qs5094m9ftmih12yivastg4gh&amp;st=7s1lqr7s&amp;raw=1"></audio>
       </div>
 
       <!-- Galeria -->
@@ -286,34 +326,78 @@
   </main>
 
   <script>
-    // Transição de Entrada (Entrar no Site)
+    // --- TRAVAS E BLOQUEIOS DE SEGURANÇA ---
+    
+    function showForbiddenAlert() {
+      const alert = document.getElementById('forbidden-alert');
+      alert.classList.remove('opacity-0', 'pointer-events-none');
+      alert.classList.add('opacity-100');
+      
+      setTimeout(() => {
+        alert.classList.remove('opacity-100');
+        alert.classList.add('opacity-0', 'pointer-events-none');
+      }, 2000);
+    }
+
+    // Bloqueia Botão Direito (Menu Contextual)
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showForbiddenAlert();
+    });
+
+    // Bloqueia Atalhos de Teclado (Ctrl+U, F12, Ctrl+Shift+I, etc)
+    document.addEventListener('keydown', (e) => {
+      if (
+        e.key === 'F12' || 
+        (e.ctrlKey && (e.key === 'u' || e.key === 'U')) || 
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+        (e.ctrlKey && (e.key === 's' || e.key === 'S'))
+      ) {
+        e.preventDefault();
+        showForbiddenAlert();
+      }
+    });
+
+    // --- EFEITO DE PARTICULAS NO CURSOR ---
+    document.addEventListener('mousemove', (e) => {
+      const particle = document.createElement('div');
+      particle.className = 'cursor-particle';
+      particle.style.left = e.clientX + 'px';
+      particle.style.top = e.clientY + 'px';
+      
+      const size = Math.random() * 8 + 4;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+
+      document.body.appendChild(particle);
+
+      setTimeout(() => {
+        particle.remove();
+      }, 800);
+    });
+
+    // --- NAVEGAÇÃO E PLAYER DE ÁUDIO ---
     function enterSite() {
       const startScreen = document.getElementById('start-screen');
       const mainContent = document.getElementById('main-content');
 
-      // Oculta tela inicial com animação
       startScreen.classList.add('opacity-0', 'pointer-events-none');
       
       setTimeout(() => {
         startScreen.style.display = 'none';
-        
-        // Exibe o conteúdo principal
         mainContent.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
         mainContent.classList.add('opacity-100', 'scale-100');
 
-        // Toca a música automaticamente ao clicar para entrar
         togglePlay();
       }, 1000);
     }
 
-    // Likes Counter
     let likes = 143;
     function addLike(e) {
       likes++;
       document.getElementById('like-counter').innerText = likes;
     }
 
-    // Controls de Audio Player
     const audio = document.getElementById('audio-player');
     const playIcon = document.getElementById('play-icon');
     const albumArt = document.getElementById('album-art');
