@@ -42,6 +42,52 @@
       overflow-x: hidden;
     }
 
+    /* Animação dos Corações Flutuantes no Fundo */
+    .bg-heart {
+      position: fixed;
+      bottom: -20px;
+      color: var(--light-pink);
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(0.8) rotate(0deg);
+        opacity: 0.1;
+      }
+      50% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-105vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Animação dos Corações do Botão de Like */
+    .burst-heart {
+      position: fixed;
+      pointer-events: none;
+      color: var(--light-pink);
+      z-index: 9999;
+      font-size: 20px;
+      animation: heartBurst 1.2s ease-out forwards;
+    }
+
+    @keyframes heartBurst {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--tx)), calc(-50% - 100px)) scale(1.5) rotate(var(--rot));
+      }
+    }
+
     /* Tela Inicial Blur & Background */
     #start-screen {
       background: linear-gradient(rgba(13, 7, 20, 0.92), rgba(13, 7, 20, 0.92)),
@@ -117,6 +163,9 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-between p-4 relative">
 
+  <!-- CONTAINER DE CORAÇÕES FLUTUANTES NO FUNDO -->
+  <div id="hearts-bg-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
   <!-- AVISO DE ACESSO PROIBIDO -->
   <div id="forbidden-alert" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-[var(--deep-purple)]/90 border border-[var(--light-pink)] text-[var(--light-pink)] px-6 py-3 rounded-2xl shadow-2xl backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 font-mono text-xs uppercase tracking-widest">
     <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
@@ -158,7 +207,7 @@
   </div>
 
   <!-- CONTEÚDO PRINCIPAL DA PÁGINA -->
-  <main id="main-content" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 transition-all duration-1000 ease-out my-auto pb-6 opacity-0 pointer-events-none transform scale-95">
+  <main id="main-content" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 transition-all duration-1000 ease-out my-auto pb-6 opacity-0 pointer-events-none transform scale-95 z-10">
     
     <!-- SEÇÃO ESQUERDA: PERFIL -->
     <section class="md:col-span-5 flex flex-col gap-4 md:gap-6">
@@ -359,6 +408,53 @@
   </footer>
 
   <script>
+    // --- CORAÇÕES FLUTUANTES NO BACKGROUND ---
+    function createBackgroundHearts() {
+      const container = document.getElementById('hearts-bg-container');
+      const heartCount = 15;
+
+      for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('i');
+        heart.className = 'fa-solid fa-heart bg-heart';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+        heart.style.animationDuration = (Math.random() * 8 + 6) + 's';
+        heart.style.animationDelay = (Math.random() * 5) + 's';
+        container.appendChild(heart);
+      }
+    }
+    createBackgroundHearts();
+
+    // --- EFEITO DE CORAÇÕES AO CLICAR EM LIKE ---
+    let likes = 143;
+    function addLike(e) {
+      likes++;
+      document.getElementById('like-counter').innerText = likes;
+
+      const btn = e.currentTarget;
+      const rect = btn.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      for (let i = 0; i < 8; i++) {
+        const heart = document.createElement('i');
+        heart.className = 'fa-solid fa-heart burst-heart';
+        heart.style.left = centerX + 'px';
+        heart.style.top = centerY + 'px';
+        
+        const tx = (Math.random() - 0.5) * 120;
+        const rot = (Math.random() - 0.5) * 60;
+        heart.style.setProperty('--tx', `${tx}px`);
+        heart.style.setProperty('--rot', `${rot}deg`);
+
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+          heart.remove();
+        }, 1200);
+      }
+    }
+
     // --- BLOQUEIO DE ARRASTADO (DRAG AND DROP) ---
     document.addEventListener('dragstart', (e) => {
       e.preventDefault();
@@ -395,7 +491,6 @@
     });
 
     // --- TRAVAS E BLOQUEIOS DE SEGURANÇA ---
-    
     function showForbiddenAlert() {
       const alert = document.getElementById('forbidden-alert');
       alert.classList.remove('opacity-0', 'pointer-events-none');
@@ -458,12 +553,6 @@
 
         togglePlay();
       }, 1000);
-    }
-
-    let likes = 143;
-    function addLike(e) {
-      likes++;
-      document.getElementById('like-counter').innerText = likes;
     }
 
     const audio = document.getElementById('audio-player');
