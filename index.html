@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Galeria Profissional WRS</title>
+    
+    <!-- CÓDIGO DE PERFORMANCE ULTRA - GALERIA WRS -->
+    <script>
+        (function() {
+            const domains = [
+                'https://dl.dropboxusercontent.com',
+                'https://www.dropbox.com',
+                'https://ucarecdn.com',
+                'https://i.imgur.com'
+            ];
+            
+            const fragment = document.createDocumentFragment();
+            domains.forEach(url => {
+                const preconnect = document.createElement('link');
+                preconnect.rel = 'preconnect';
+                preconnect.href = url;
+                preconnect.crossOrigin = "anonymous";
+                
+                const dnsPrefetch = document.createElement('link');
+                dnsPrefetch.rel = 'dns-prefetch';
+                dnsPrefetch.href = url;
+                
+                fragment.appendChild(preconnect);
+                fragment.appendChild(dnsPrefetch);
+            });
+            document.head.appendChild(fragment);
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '400px 0px', 
+                threshold: 0.01
+            };
+
+            const loadVisual = (img) => {
+                if (img.dataset.src) {
+                    img.decoding = "async"; 
+                    img.src = img.dataset.src;
+                    img.onload = () => {
+                        img.classList.add('loaded');
+                        img.style.opacity = "1";
+                    };
+                }
+            };
+
+            window.observer = new IntersectionObserver((entries, self) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadVisual(entry.target);
+                        self.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+        })();
+    </script>
+
+    <style>
+        :root {
+            --neon-blue: #0048FF;
+            --bg-dark: #050505;
+            --card-bg: rgba(17, 17, 17, 0.5);
+            --deep-blue-bar: rgba(0, 10, 31, 0.5); 
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior-y: contain; 
+        }
+
+        img {
+            content-visibility: auto;
+            contain-intrinsic-size: 300px 300px;
+            image-rendering: -webkit-optimize-contrast;
+            backface-visibility: hidden;
+            transition: opacity 0.3s ease-in;
+        }
+
+        .nav-container::-webkit-scrollbar,
+        .content-area::-webkit-scrollbar,
+        #inicio::-webkit-scrollbar,
+        .section::-webkit-scrollbar {
+            width: 8px;
+            height: 0px; 
+        }
+        
+        .nav-container::-webkit-scrollbar-track,
+        .content-area::-webkit-scrollbar-track,
+        #inicio::-webkit-scrollbar-track,
+        .section::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .nav-container::-webkit-scrollbar-thumb,
+        .content-area::-webkit-scrollbar-thumb,
+        #inicio::-webkit-scrollbar-thumb,
+        .section::-webkit-scrollbar-thumb {
+            background: var(--neon-blue);
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .cursor-star {
+            position: absolute;
+            background: #fff;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000002;
+            box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+            animation: trailFade 0.7s linear forwards;
+        }
+
+        @keyframes trailFade {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.2); opacity: 0; }
+        }
+
+        .copy-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5, 5, 5, 0.95);
+            border: 2px solid var(--neon-blue);
+            padding: 30px;
+            z-index: 10000;
+            text-align: center;
+            box-shadow: 0 0 50px var(--neon-blue);
+            border-radius: 10px;
+            min-width: 300px;
+        }
+
+        .copy-alert h3 {
+            margin: 0 0 10px 0;
+            background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff);
+            background-size: 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: moveGradient 4s linear infinite;
+        }
+
+        .copy-alert p {
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/upf8CYl.jpeg') center/cover no-repeat;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            transition: opacity 1s ease, transform 1s ease, visibility 1s;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .moldura-flutuante {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border: 3px solid var(--neon-blue);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px var(--neon-blue);
+            animation: float 3s ease-in-out infinite;
+            margin-bottom: 40px;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .moldura-flutuante img { width: 100%; height: 100%; object-fit: contain; }
+
+        #status-dot {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 20px; 
+            height: 20px; 
+            border-radius: 50%; 
+            border: 3px solid white; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+            transition: background-color 0.5s ease; 
+            background-color: #9e9e9e;
+            z-index: 10;
+        }
+
+        .btn-entrar, .btn-xat {
+            font-weight: bold; color: white; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer;
+            background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff);
+            background-size: 300%; animation: moveGradient 4s linear infinite; box-shadow: 0 0 20px rgba(0, 72, 255, 0.6); transition: 0.3s; margin: 5px;
+        }
+
+        .btn-entrar { padding: 15px 60px; font-size: 20px; }
+        .btn-xat { padding: 8px 30px; font-size: 14px; }
+
+        .xat-submenu {
+            display: none; flex-direction: column; gap: 5px; margin-top: 10px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 10px; border: 1px solid var(--neon-blue);
+        }
+
+        .xat-link { color: white; text-decoration: none; font-size: 12px; font-weight: bold; padding: 5px 15px; border-radius: 5px; transition: 0.3s; cursor: pointer; }
+        .xat-link:hover { background: var(--neon-blue); }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        body {
+            background-image: url('https://i.imgur.com/Jb4XOYs.gif'); background-attachment: fixed; background-size: cover; background-position: center;
+            color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;
+            -webkit-user-select: none; user-select: none;
+            overflow-x: hidden;
+        }
+
+        .perfil-header { text-align: center; padding: 20px; border-bottom: 2px solid var(--neon-blue); background: rgba(5, 5, 5, 0.5); z-index: 10; flex-shrink: 0; }
+        .perfil-header h1 {
+            font-size: 2.5rem; margin: 0; background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff);
+            background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 4s linear infinite;
+        }
+
+        .perfil-header p { font-weight: bold; text-transform: uppercase; background: linear-gradient(-45deg, #ffffff, #000000, #ffffff, #000000); background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 5s linear infinite; }
+
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+        .nav-container {
+            display: flex; flex-direction: column; width: 250px; gap: 8px; padding: 15px; background: rgba(0, 0, 0, 0.4); border-right: 1px solid var(--neon-blue);
+            z-index: 20; overflow-y: auto; overflow-x: hidden; flex-shrink: 0; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); -webkit-overflow-scrolling: touch; touch-action: pan-y;
+        }
+
+        .nav-hidden .nav-container { transform: translateX(-100%); position: absolute; }
+
+        .nav-btn {
+            background: var(--deep-blue-bar); border: 1px solid rgba(0, 38, 138, 0.5); padding: 12px; cursor: pointer;
+            font-weight: bold; text-transform: uppercase; font-size: 15px; transition: all 0.3s ease; color: white; text-align: left; display: block; flex-shrink: 0;
+        }
+
+        .nav-btn:hover, .nav-btn.active { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); background: rgba(0, 72, 255, 0.3); transform: translateX(8px); }
+        .nav-btn span { background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; }
+
+        .content-area { flex: 1; padding: 30px; overflow-y: auto; overflow-x: hidden; z-index: 15; position: relative; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+
+        .btn-voltar { display: none; margin-bottom: 20px; padding: 10px 20px; font-size: 14px; background: var(--deep-blue-bar); border: 1px solid var(--neon-blue); color: white; cursor: pointer; text-transform: uppercase; font-weight: bold; border-radius: 4px; box-shadow: 0 0 10px var(--neon-blue); }
+        .nav-hidden .btn-voltar { display: inline-block; }
+
+        .section { display: none; width: 100%; overflow-x: hidden; }
+        .section.active { display: block; }
+        
+        #inicio, #gifs, #pcback-gif, #pstyle-gif, #pcback-est, #pstyle-est, #fundos, #player { 
+            max-height: 100%; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            padding-right: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .grid-container { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+        .grid-gifs { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        
+        .card { background: var(--card-bg); border: 1px solid rgba(34, 34, 34, 0.5); border-radius: 4px; overflow: hidden; text-align: center; cursor: zoom-in; transition: 0.3s; }
+        .card:hover { border-color: var(--neon-blue); transform: scale(1.05); box-shadow: 0 0 25px var(--neon-blue); background: rgba(17, 17, 17, 0.8); }
+        .card img { width: 100%; display: block; opacity: 0; }
+        .card .label { padding: 5px; font-size: 10px; text-transform: uppercase; font-weight: bold; color: #fff; background: rgba(0,0,0,0.5); }
+
+        .info-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) {
+            .info-cards { grid-template-columns: 1fr; }
+            .info-card.full-width { grid-column: 1; }
+        }
+
+        .info-card { background: var(--card-bg); border: 1px solid rgba(34, 34, 34, 0.5); padding: 20px; border-radius: 4px; transition: all 0.3s ease; word-wrap: break-word; }
+        .info-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); transform: scale(1.01); background: rgba(17, 17, 17, 0.7); }
+        .info-card.full-width { grid-column: 1 / span 2; }
+        .info-card h3 { margin-top: 0; text-transform: uppercase; background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 4s linear infinite; }
+
+        .marquee-container { background: var(--deep-blue-bar); border: 1px solid rgba(0, 38, 138, 0.5); width: 100%; overflow: hidden; margin-bottom: 20px; padding: 15px 0; position: relative; display: flex; align-items: center; }
+        .marquee-content { display: inline-block; white-space: nowrap; position: absolute; will-change: transform; animation: linear-scroll-inside 15s linear infinite; }
+        .texto-animado { font-weight: bold; font-size: 22px; background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; padding: 0 10px; }
+
+        @keyframes linear-scroll-inside { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes moveGradient { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+        .player-container { max-width: 400px; margin: 20px auto; background: var(--card-bg); border: 2px solid var(--neon-blue); border-radius: 8px; padding: 20px; box-shadow: 0 0 20px var(--neon-blue); text-align: center; position: relative; z-index: 10; }
+        .track-marquee { width: 100%; overflow: hidden; white-space: nowrap; background: rgba(0, 0, 0, 0.3); padding: 10px 0; margin-bottom: 20px; position: relative; height: 30px; display: flex; align-items: center; }
+        .track-name, .vol-label { display: inline-block; font-weight: bold; text-transform: uppercase; background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; }
+        .track-name { position: absolute; will-change: transform; animation: linear-scroll-inside 20s linear infinite, moveGradient 3s linear infinite; }
+
+        .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); justify-content: center; align-items: center; }
+        .modal-content { max-width: 80%; max-height: 80%; border: 2px solid var(--neon-blue); }
+
+        .exclusive-footer { margin-top: auto; padding-top: 15px; text-align: center; font-size: 9px; font-weight: bold; text-transform: uppercase; background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; }
+    </style>
+</head>
+<body oncontextmenu="showAlert(); return false;">
+
+    <div id="copyright-alert" class="copy-alert">
+        <h3>COPYRIGHT - ACESSO PROIBIDO</h3>
+        <p>Propriedade de Gabr (1777777)</p>
+    </div>
+
+    <div id="intro-screen">
+        <div class="moldura-flutuante">
+            <img src="https://i.imgur.com/pKuY3f8.gif">
+            <div id="status-dot" title="Verificando status..."></div>
+        </div>
+        <button class="btn-entrar" onclick="entrarGaleria()">Entrar</button>
+        <button class="btn-xat" onclick="toggleXatMenu()">Xat</button>
+        <div id="xat-menu" class="xat-submenu">
+            <div onclick="irPara('https://xat.com/Butecopremium')" class="xat-link">Xat Buteco</div>
+            <div onclick="irPara('https://xat.com/TUGA')" class="xat-link">Xat TUGA</div>
+            <div onclick="irPara('https://xat.com/trade')" class="xat-link">Xat Trade</div>
+        </div>
+    </div>
+
+    <div class="perfil-header">
+        <h1>GALERIA DE GIFS</h1>
+        <p>Gabr (1777777)</p>
+    </div>
+
+    <div class="main-wrapper" id="mainWrapper">
+        <div class="nav-container">
+            <button class="nav-btn active" onclick="showTab('inicio')"><span>Início</span></button>
+            <button class="nav-btn" onclick="showTab('gifs')"><span>GIFS</span></button>
+            <button class="nav-btn" onclick="showTab('pcback-gif')"><span>PCBACK GIFS</span></button>
+            <button class="nav-btn" onclick="showTab('pstyle-gif')"><span>PSTYLE GIFS</span></button>
+            <button class="nav-btn" onclick="showTab('pcback-est')"><span>PCBACK ESTÁTICO</span></button>
+            <button class="nav-btn" onclick="showTab('pstyle-est')"><span>PSTYLE ESTÁTICO</span></button>
+            <button class="nav-btn" onclick="showTab('fundos')"><span>FUNDOS</span></button>
+            <div class="nav-btn" onclick="irPara('https://gabr1777777.github.io/GaleriaXatspace/')"><span>XATSPACE</span></div>
+            <button class="nav-btn" onclick="showTab('player')"><span>Player</span></button>
+            <div class="exclusive-footer">Galeria exclusiva 2026 - By: Gabr (1777777)</div>
+        </div>
+
+        <div class="content-area">
+            <button class="btn-voltar" onclick="voltarMenu()">« Voltar para o Menu</button>
+            
+            <div id="inicio" class="section active">
+                <div class="info-cards">
+                    <div class="info-card full-width"><h3>Sell ID 10 Digts  (Never used)</h3><p id="ids-venda">(SOLD 1553333003), (SOLD 1553333005), 1553333013, 1553333024, 1553333040, 1553333505, 1553333903, 1553333027, 1553333484, 1553333494, 1553333579, 1549200800, 1549200900, (SOLD 1549203020), 1553350006, 1553342014, 1553350001, 1553349911, 1553350010, 1553350019, 1553350022, 1553350080, 1553358001, 1553358004, 1549200788, 1549200822, 1549200844, 1557799002, 1553366005, 1549200844, 1553347776, 1529199110, 1529199070, 1529199294, 1529199883, 1533393277, 1533393300, 1533393338, (SOLD 1533393573), 1533393580, 1529200133, 1529202490, (SOLD 1529202505), 1529202530, 1529204010, 1533394241, 1533393639, 1529202425, 1529202400, 1533394373, 1533394323, 1533394241, 1529199885, 1533393635, 1533393595, 1533393141, 1533393400, 1533393344, 1533393318, 1547821112, 1547821110, 1552015343, 1552015251, 1547820900, 1552015200, 1552015147, 1552015145, 1557799021, 1557799033, 1557788921, 1557776683, 1557733214, 1557771518, 1549303238, 1553473771, 1553382335, 1553379909, 1553377996, 1553368939, 1553367700, 1553366020, 1549171706, 1553361002, 1549208099, 1549202628, 1549202625, 1553396919, 1549202188, 1549202166, 1549201767, 1549201765, 1549201363, 1549201355, 1549201141, 1549201138, 1549201022, 1549200949, 1549200870, 1549200822, 1553358009, 1553358007, 1553356878, 1549155545, 1553350025, 1553349904, 1549155586, 1549155570, 1549155560, 1553347799, 1553347788, 1553347779, 1553345350, 1553345344, 1553345337, 1553345060, 1553344044, 1553343736, 1553343733, 1553343723, 1553343013, 1553343001, 1553342448, 1553339348, 1553339563, 1553339558, 1553339371, 1553339387, 1553339366, 1553338668, 1553338633, 1553339355, 1553338688, 1553338090, 1553337479, 1553335233, 1553335220, 1553333908, 1553333491, 1553333464, 1553332927, 1553327338, 1553327323, 1553322031, 1553329282, </p></div>
+                </div>
+            </div>
+
+            <div id="gifs" class="section"></div>
+            <div id="pcback-gif" class="section"></div>
+            <div id="pstyle-gif" class="section"></div>
+            <div id="pcback-est" class="section"></div>
+            <div id="pstyle-est" class="section"></div>
+            <div id="fundos" class="section"></div>
+
+            <div id="player" class="section">
+                <div class="player-container">
+                    <div class="track-marquee"><span id="trackName" class="track-name">Selecione uma música...</span></div>
+                    <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
+                        <button class="nav-btn" style="padding:10px" onclick="prevTrack()">«</button>
+                        <button class="nav-btn" style="padding:10px" id="playBtn" onclick="togglePlay()">▶</button>
+                        <button class="nav-btn" style="padding:10px" onclick="nextTrack()">»</button>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                            <span class="vol-label" style="font-size: 10px;">Vol</span>
+                            <button class="nav-btn" style="padding:10px 5px; width:38px; text-align:center; font-size:11px;" id="volBtn" onclick="cycleVolume()">50%</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalZoom" class="modal" onclick="closeZoom()"><img class="modal-content" id="imgZoom"></div>
+
+    <script>
+        document.addEventListener('mousemove', function(e) {
+            const star = document.createElement('div');
+            star.classList.add('cursor-star');
+            star.style.left = e.pageX + 'px'; star.style.top = e.pageY + 'px';
+            document.body.appendChild(star);
+            setTimeout(() => { star.remove(); }, 700);
+        });
+
+        function irPara(url) { window.open(url, '_blank'); }
+
+        async function updateStatus() {
+            try {
+                const res = await fetch('https://illuxat.com/api/online/Gabr');
+                const json = await res.json();
+                const dot = document.getElementById('status-dot');
+                const isOnline = json.data?.status?.toLowerCase() === 'online';
+                
+                if (isOnline) {
+                    dot.style.backgroundColor = "#22c55e"; 
+                    dot.title = "Online no xat";
+                } else {
+                    dot.style.backgroundColor = "#ef4444"; 
+                    dot.title = "Offline no xat";
+                }
+            } catch (e) {
+                console.error("Erro ao carregar status:", e);
+                document.getElementById('status-dot').style.backgroundColor = "#9e9e9e";
+            }
+        }
+        setInterval(updateStatus, 60000);
+
+        function toggleXatMenu() {
+            const menu = document.getElementById('xat-menu');
+            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function showAlert() {
+            const alertBox = document.getElementById('copyright-alert');
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 2500);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83) || e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73)) {
+                showAlert(); e.preventDefault(); return false;
+            }
+        });
+
+        // Player de Música
+        const playlist = [
+            { name: "Neoni - Carry on Wayward Son", url: "https://www.dropbox.com/scl/fi/55a1awegvjnlt8i1atia9/Neoni-Carry-on-Wayward-Son.mp3?rlkey=8v9te2igxtxt7p40xlhlls697&st=ths9my02&raw=1" },
+            { name: "Lukas Graham - 7 Years", url: "https://www.dropbox.com/scl/fi/e49kcnpxz99aej767r3gn/Lukas-Graham-7-Years.mp3?rlkey=7q32myx2mhm1xqnl9v82us6v1&st=j0fknfqk&raw=1" },
+            { name: "OneRepublic - Counting Stars", url: "https://www.dropbox.com/scl/fi/0oynubgpuxx3098p8lgn9/OneRepublic-Counting-Stars.mp3?rlkey=up1vcphxao6714ko2kc10b10z&st=4qkuh835&raw=1" },
+            { name: "The Sound of Silence – Rising to the Night", url: "https://dl.dropboxusercontent.com/scl/fi/2y9zhx5zjsdxg3zljc2f9/sound-of-silence.mp3?rlkey=88zg0td3loy40uxmcm9rnk1jt&raw=1" },
+            { name: "Punic NTPV GodDamn e Phonk King - Peito Cheio", url: "https://www.dropbox.com/scl/fi/p20gy4mcae9fjzs4ksv7x/Punic-NTPV-GodDamn-e-Phonk-King-Peito-Cheio.mp3?rlkey=nv0bi08m6iumyj68qxc5ucdty&st=uj8mewni&raw=1" },
+            { name: "Teddy Swims - Lose Control", url: "https://www.dropbox.com/scl/fi/o3qam7tz7avp9zjmgr52m/Teddy-Swims-Lose-Control.mp3?rlkey=im86yd8l4ftrn43igvtueij2b&st=779tsr5s&raw=1" }
+        ];
+
+        let currentTrack = 0; 
+        const audio = new Audio();
+        audio.volume = 0.5;
+
+        function cycleVolume() {
+            if (audio.volume === 0.0) { audio.volume = 0.5; document.getElementById('volBtn').innerText = "50%"; }
+            else if (audio.volume === 0.5) { audio.volume = 1.0; document.getElementById('volBtn').innerText = "100%"; }
+            else { audio.volume = 0.0; document.getElementById('volBtn').innerText = "0%"; }
+        }
+
+        function entrarGaleria() {
+            const intro = document.getElementById('intro-screen');
+            intro.style.opacity = '0'; intro.style.transform = 'scale(1.1)'; intro.style.visibility = 'hidden';
+            setTimeout(() => { intro.style.display = 'none'; }, 1000); 
+            togglePlay(); 
+        }
+
+        function showTab(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) {
+                target.classList.add('active');
+                target.scrollTop = 0; 
+                document.querySelector('.content-area').scrollTop = 0;
+            }
+            // Manter botão ativo
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(id)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (window.innerWidth <= 768) { document.getElementById('mainWrapper').classList.add('nav-hidden'); }
+        }
+
+        function voltarMenu() { document.getElementById('mainWrapper').classList.remove('nav-hidden'); }
+        function loadTrack(i) { audio.src = playlist[i].url; document.getElementById('trackName').innerText = playlist[i].name; }
+        function togglePlay() { if(audio.paused) { if(!audio.src) loadTrack(currentTrack); audio.play().catch(e => {}); document.getElementById('playBtn').innerText='||'; } else { audio.pause(); document.getElementById('playBtn').innerText='▶'; } }
+        function nextTrack() { currentTrack=(currentTrack+1)%playlist.length; loadTrack(currentTrack); audio.play(); document.getElementById('playBtn').innerText='||'; }
+        function prevTrack() { currentTrack=(currentTrack-1+playlist.length)%playlist.length; loadTrack(currentTrack); audio.play(); document.getElementById('playBtn').innerText='||'; }
+        audio.onended = nextTrack;
+
+        function openZoom(src) { document.getElementById("imgZoom").src = src; document.getElementById("modalZoom").style.display = "flex"; }
+        function closeZoom() { document.getElementById("modalZoom").style.display = "none"; }
+
+        function render() {
+            updateStatus();
+            
+            const gifSec = document.getElementById('gifs');
+            const dataGifs = [
+                { marquee: "✧ BLUFFTITLER - ONLY NAME - 250 XATS ✧", prefix: "Name - ", ids: ["bidwh1D", "wR2NpTV", "IMrOUcP", "Hdi04Sg", "OcGaTXA", "wJZiwkG", "jDgxhBQ", "USQgVk8", "4bhAWa5", "0LL3muu"] },
+                { marquee: "✧ BLUFFTITLER - NAME + PHOTO - 350 XATS ✧", prefix: "Bluff - ", ids: ["F0b4mnJ", "65bzz5V", "ZetkVFF", "JqzxOwt", "NK9Z8rU", "RNIlFI3", "bSmUjsQ", "R6klF5K", "cgyGLHQ", "ctF1vyH", "Ge90Xy7", "7Z8xEC8", "G8HFkiG", "sh7u3UM", "y0WgmxJ", "Vvw2SMU", "uoNJlEe"] },
+                { marquee: "✧ CANVA - NAME + PHOTO - 300 XATS ✧", prefix: "Canva - ", ids: ["hWVyLox", "Uxlzu5C", "Crt716T", "xo4npxf", "jUG54d4", "gMQ3Fo9", "xvM1ixb", "cwRIh51", "db8sdi9", "nRJQ0BB"] },
+                { marquee: "✧ AFTEREFECTS - NAME + PHOTO - 400 XATS ✧", prefix: "After - ", ids: ["S5pXaVI", "qQB5w4C", "QlniJvg", "shyBpPS", "LzTvWk4", "aLBEkKq", "kJmAoul", "uOwOmwM", "u0Cse5Q", "ioDaClP", "PD03EYd", "HVFwoO9", "ueBRxvV", "XkwoKCf", "ULcq67R", "afxBCK8", "NKjJIGs", "xDhKvCC", "vvcOaEK", "ups9FgX", "JeY6A7M", "zDyoEgZ", "0FklDw9", "FX6gdFw", "V3LO0YG", "r9yfJNZ", "R3sO6Dv", "P8DpN4L", "fRfZuO7", "BPgPihm", "5HxfNaB", "FILAVQP", "5IoR515", "KUQ1WsX", "ZuaO9n5", "eYUpRds", "EkhA4lw", "ufOP9QG", "w2URYst", "1uMiE0k", "JQaMJ7U", "JeVcLkk", "un368jG", "LaClQL2", "l3Az3Nz", "8ME12WB", "SWSOcvf", "HizA7mV", "HnIaNDX", "bStEaxn", "CgwrMHf", "MtDrchh", "P4UINMY", "F0ujERT", "lHdM40L", "vWKX5Fb", "UHq0679", "2tRaU1S", "XQJ8R9h", "n4sAIhn", "LaJAK5L", "RIDkkSc", "ogHzac1", "aV63fjn", "tSuJOKg", "MxeKAfQ", "A4chzU3", "bAXpFow", "d1wToYT", "IXCqwlR", "kv1EWDW", "FIulKIF", "qLhMZAE", "R9nl6Ch", "A7x7PhX", "XU4klcy", "DRUBV0y", "geacP52", "lNh2rdL", "rS3PItx", "AzuyKg4", "aT6Rk4H", "0uZHgJW", "cyLfXAp", "omfCtkk", "lbauLSs", "s1rQrgg", "WNwfYTh", "XO8NzcJ", "6orVlLG", "Ocbami8", "oiVshBX", "bIP35gN", "Lwk0DWm", "N0FdNiy", "R7sOEoQ", "jrQMS1Q", "DA0VYtJ", "k21g4fQ"] },
+                { marquee: "✧ AFTEREFECTS - NAME + (2) PHOTO - 500 XATS ✧", prefix: "Love - ", ids: ["NnEIlrv", "8hrgq1D", "MqnmO8R", "oRvL0X3", "luwMPoD"] },
+                { marquee: "✧ AFTEREFECTS - DJ - NAME + PHOTO 450 XATS ✧", prefix: "DJ - ", ids: ["Bj6WFKZ", "GGrjZnE", "jJefFUv", "tesP8Me", "VRBqDtS", "WnnPvsU"] },
+                { marquee: "✧ AFTEREFECTS - HALLOWEEN - NAME + PHOTO 450 XATS ✧", prefix: "Hallo - ", ids: ["tYerofL", "DhJDXHE", "w3rSXf6", "9nHfmtZ", "61Eafym", "4ON7Gu0"] },
+                { marquee: "✧ AFTEREFECTS - CHRISTMAS - NAME + PHOTO 450 XATS ✧", prefix: "Xmas - ", ids: ["79ymrS9", "FOyoZu1", "rIs0a2w", "4USFEwb", "5vvU8qn"] },
+                { marquee: "✧ PHOTOSCAPE - (1) PHOTO - 100 XATS (2) PHOTOS - 200 XATS (3) PHOTOS - 300 XATS ✧", prefix: "Parpadeo - ", ids: ["bXTTG5V", "MdemxH0", "VpU6eOY", "NUIGQ3f", "NP25oCb", "mXHqKwc", "bKcj9xf"] }
+            ];
+
+            gifSec.innerHTML = "";
+            dataGifs.forEach(sec => {
+                let h = `<div class="marquee-container"><div class="marquee-content"><span class="texto-animado">${sec.marquee}</span></div></div><div class="grid-gifs">`;
+                sec.ids.forEach((id, i) => { 
+                    h += `<div class="card" onclick="openZoom('https://i.imgur.com/${id}.gif')"><img data-src="https://i.imgur.com/${id}.gif" class="lazy"><div class="label">${sec.prefix}${i+1}</div></div>`; 
+                });
+                h += `</div>`; gifSec.innerHTML += h;
+            });
+
+            const configs = [
+                { id: 'pcback-gif', marquee: "✧ PCBACK GIF  - 450 XATS ✧", label: "PCBack Gif", 
+                    urls: [
+                        'SFnk7A6.gif', 'KKY2zqU.gif', 'fmhynyY.gif', '28xDTg0.gif', '9R35WMu.gif', 'kSK0E1f.gif', 'l2y5xFa.gif', 'ZDbAiNK.gif', 'fRmpR5e.gif', 'TUdO2r8.gif',
+                        'clgE48o.gif', 'gWgkiku.gif', 'vS55bUO.gif', 'Xib4qKf.gif', 'pcGjNGM.gif', 'n4JMxfr.gif', 'XrJTb1e.gif', 'dyvcHuK.gif', 'l8jI2ia.gif', 'UlnuUQG.gif',
+                        'opekB2r.gif', '0uvOiJm.gif', '2kEbWrY.gif', '07m3bwV.gif', 'D2JnSmE.gif'
+                    ] 
+                },
+                { id: 'pstyle-gif', marquee: "✧ PSTYLE GIF - 350 XATS ✧", label: "Pstyle Gif", 
+                    urls: [
+                        'rUIzfWU.gif', 'dGfJDfh.gif', 'ZXBA6F1.gif', 'dImC226.gif', '4P6kTS6.gif', 'E6fZa1k.gif', 'iaCw0P8.gif', '3mC3Qgh.gif', 'jSyWPEs.gif', 'vLnBaqA.gif',
+                        'LmDTRY5.gif', 'PhxEvbL.gif', '1pMwbMm.gif', '7KedrNM.gif', 'yqLPTKa.gif', 'FoW5FXN.gif', 'vWDVot8.gif', 'RJHbbfm.gif', 'PHiebbT.gif', 'Rcqw2MT.gif',
+                        'whcMVzN.gif', 'zgC18pX.gif'
+                    ] 
+                },
+                { id: 'pcback-est', marquee: "✧ PCBACK ESTÁTICO - 300 XATS ✧", label: "PCBack", 
+                    urls: [
+                        'OyX4Jwt.png', 'dbSy2Rf.png', 'uBp1ypU.png', '83Glu7j.png', 'QtSYA09.png', 'WDKosnm.png', 'WfVIivT.png', 'ojcJMIb.png', 'Dn05p8R.png', '5iJRrrF.png',
+                        'uBp1ypU.png', '98FssR8.png', 'MxVwAsp.png', 'RxlqG4b.png', 'TdAGQpt.png'
+                    ] 
+                },
+                { id: 'pstyle-est', marquee: "✧ PSTYLE ESTÁTICO - 250 XATS ✧", label: "Pstyle", 
+                    urls: [
+                        'Ii4pk4g.png', 'm2Ew85b.png', 'zlcL7Dh.png', 'E6C3t04.png', '6PUSQBo.png', 'Zpv9tET.png', 'eqKUD5c.png', 'zTFcRvU.png', 'Sl2JhZi.png', '3rUpT2u.png'
+                    ] 
+                },
+                { id: 'fundos', marquee: "✧ FUNDOS - 700 XATS ✧", label: "FUNDO", 
+                    urls: [
+                        'eJtGG3D.png', 'Q8XwtQZ.png', '6phSrhR.png', 'yeQZf5S.png', 'RDsR3k5.png', 'EXCVWDO.png', 'umcaiMq.png', 'hzjUj8q.png', 'zQj5X8P.png', 'OojsaCj.png',
+                        'EHK0Ik0.png', 'sSfzBLf.png', 'J6tAgOm.png', 'hqxUYUr.png', 'COfEeEX.png', 'BKGUII2.png'
+                    ] 
+                }
+            ]
+
+            configs.forEach(c => {
+                const target = document.getElementById(c.id);
+                if (target) {
+                    let html = `<div class="marquee-container"><div class="marquee-content"><span class="texto-animado">${c.marquee}</span></div></div><div class="grid-container">`;
+                    c.urls.forEach((img, i) => {
+                        html += `<div class="card" onclick="openZoom('https://i.imgur.com/${img}')">
+                                 <img data-src="https://i.imgur.com/${img}" class="lazy"><div class="label">${c.label} - ${i+1}</div></div>`;
+                    });
+                    target.innerHTML = html + `</div>`;
+                }
+            });
+
+            // Ativar Observer de Imagens
+            const lazyImages = document.querySelectorAll('img.lazy');
+            lazyImages.forEach((img, idx) => {
+                if(idx < 6) {
+                    img.src = img.dataset.src;
+                    img.style.opacity = "1";
+                } else {
+                    window.observer.observe(img);
+                }
+            });
+        }
+        window.onload = render;
+    </script>
+</body>
+</html>
