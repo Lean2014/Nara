@@ -20,6 +20,14 @@
       background-color: #0d0714;
       color: #ffffff;
       font-family: system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Tela Inicial Blur & Background */
+    #start-screen {
+      background-color: rgba(13, 7, 20, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
 
     .glass-card {
@@ -62,15 +70,39 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4 relative">
 
-  <main id="main-content" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 transition-all duration-1000 ease-out my-auto pb-6">
+  <!-- TELA INICIAL (START SCREEN) -->
+  <div id="start-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 transition-opacity duration-1000 ease-in-out px-4 text-center">
+    <div class="relative w-32 h-32 md:w-40 md:h-40">
+      <div class="absolute inset-0 rounded-full border border-t-[var(--light-pink)] border-r-[var(--purple-mid)] border-b-[var(--light-pink)] border-l-[var(--purple-mid)] animate-[spin_6s_linear_infinite] opacity-80"></div>
+      <div class="absolute inset-3 rounded-full border border-white/10"></div>
+      <div class="absolute inset-4 rounded-full overflow-hidden flex items-center justify-center bg-black cursor-pointer group" onclick="enterSite()">
+        <img 
+          src="https://xatimg.com/image/dCvg0UkAcsd1.gif?auto=format&amp;fit=crop&amp;w=400&amp;q=80" 
+          onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&amp;fit=crop&amp;w=400&amp;q=80'" 
+          alt="Avatar de Entrada"
+          class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500 scale-110 group-hover:scale-100"
+        >
+        <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-all"></div>
+      </div>
+    </div>
+    
+    <button onclick="enterSite()" class="relative z-10 group flex flex-col items-center gap-2 cursor-pointer outline-none tap-highlight-transparent">
+      <span class="text-lg md:text-xl font-serif italic text-[var(--light-pink)] tracking-[0.2em] uppercase border-b border-transparent group-hover:border-[var(--light-pink)] pb-1 transition-all duration-500">
+        Entrar
+      </span>
+    </button>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL DA PÁGINA -->
+  <main id="main-content" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 transition-all duration-1000 ease-out my-auto pb-6 opacity-0 pointer-events-none transform scale-95">
     
     <!-- SEÇÃO ESQUERDA: PERFIL -->
     <section class="md:col-span-5 flex flex-col gap-4 md:gap-6">
       
       <!-- Card Principal de Usuário -->
-      <div class="glass-card rounded-3xl p-5 md:p-6 relative overflow-hidden group cursor-pointer">
+      <div class="glass-card rounded-3xl p-5 md:p-6 relative overflow-hidden group">
         <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[var(--light-pink)] to-transparent opacity-50"></div>
         
         <div class="text-center mb-6 mt-2">
@@ -216,27 +248,27 @@
         <div id="gallery-slider" class="gallery-scroll flex overflow-x-auto gap-4 snap-x snap-mandatory scroll-smooth pb-2 -mx-2 px-2">
           
           <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
-            <img src="https://xatimg.com/image/p8kdi79qj3e5.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1618331835717-801e976710b2?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto da Galeria 1" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            <img src="https://xatimg.com/image/p8kdi79qj3e5.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1618331835717-801e976710b2?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 1" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
           <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
-            <img src="https://xatimg.com/image/uFrdfATblYeM.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto da Galeria 2" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            <img src="https://xatimg.com/image/uFrdfATblYeM.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 2" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
           <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
-            <img src="https://u.cubeupload.com/Nara/20210525172624.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto da Galeria 3" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            <img src="https://u.cubeupload.com/Nara/20210525172624.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 3" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
           <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
-            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&amp;fit=crop&amp;w=600&amp;q=80" alt="Foto da Galeria 4" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&amp;fit=crop&amp;w=600&amp;q=80" alt="Foto 4" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
           <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
-            <img src="https://images.unsplash.com/photo-1517457210348-703079e57d4b?auto=format&amp;fit=crop&amp;w=600&amp;q=80" alt="Foto da Galeria 5" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            <img src="https://images.unsplash.com/photo-1517457210348-703079e57d4b?auto=format&amp;fit=crop&amp;w=600&amp;q=80" alt="Foto 5" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
           <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
-            <img src="https://xatimg.com/image/XpZfU3uRE3Qi.png?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto da Galeria 6" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            <img src="https://xatimg.com/image/XpZfU3uRE3Qi.png?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 6" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
         </div>
@@ -253,21 +285,42 @@
     </section>
   </main>
 
-  <!-- Script básico para funcionamento das interações -->
   <script>
+    // Transição de Entrada (Entrar no Site)
+    function enterSite() {
+      const startScreen = document.getElementById('start-screen');
+      const mainContent = document.getElementById('main-content');
+
+      // Oculta tela inicial com animação
+      startScreen.classList.add('opacity-0', 'pointer-events-none');
+      
+      setTimeout(() => {
+        startScreen.style.display = 'none';
+        
+        // Exibe o conteúdo principal
+        mainContent.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+        mainContent.classList.add('opacity-100', 'scale-100');
+
+        // Toca a música automaticamente ao clicar para entrar
+        togglePlay();
+      }, 1000);
+    }
+
+    // Likes Counter
     let likes = 143;
     function addLike(e) {
       likes++;
       document.getElementById('like-counter').innerText = likes;
     }
 
+    // Controls de Audio Player
     const audio = document.getElementById('audio-player');
     const playIcon = document.getElementById('play-icon');
     const albumArt = document.getElementById('album-art');
 
     function togglePlay() {
       if (audio.paused) {
-        audio.play();
+        audio.play().catch(err => console.log('Autoplay prevenido pelo navegador'));
         playIcon.classList.remove('fa-play');
         playIcon.classList.add('fa-pause');
         albumArt.style.animationPlayState = 'running';
