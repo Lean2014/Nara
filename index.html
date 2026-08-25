@@ -1,574 +1,131 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galeria Profissional WRS</title>
-    
-    <!-- CÓDIGO DE PERFORMANCE ULTRA - GALERIA WRS -->
-    <script>
-        (function() {
-            const domains = [
-                'https://dl.dropboxusercontent.com',
-                'https://www.dropbox.com',
-                'https://ucarecdn.com',
-                'https://i.imgur.com'
-            ];
-            
-            const fragment = document.createDocumentFragment();
-            domains.forEach(url => {
-                const preconnect = document.createElement('link');
-                preconnect.rel = 'preconnect';
-                preconnect.href = url;
-                preconnect.crossOrigin = "anonymous";
-                
-                const dnsPrefetch = document.createElement('link');
-                dnsPrefetch.rel = 'dns-prefetch';
-                dnsPrefetch.href = url;
-                
-                fragment.appendChild(preconnect);
-                fragment.appendChild(dnsPrefetch);
-            });
-            document.head.appendChild(fragment);
-
-            const observerOptions = {
-                root: null,
-                rootMargin: '400px 0px', 
-                threshold: 0.01
-            };
-
-            const loadVisual = (img) => {
-                if (img.dataset.src) {
-                    img.decoding = "async"; 
-                    img.src = img.dataset.src;
-                    img.onload = () => {
-                        img.classList.add('loaded');
-                        img.style.opacity = "1";
-                    };
-                }
-            };
-
-            window.observer = new IntersectionObserver((entries, self) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        loadVisual(entry.target);
-                        self.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-        })();
-    </script>
-
-    <style>
-        :root {
-            --neon-blue: #0048FF;
-            --bg-dark: #050505;
-            --card-bg: rgba(17, 17, 17, 0.5);
-            --deep-blue-bar: rgba(0, 10, 31, 0.5); 
-        }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            overscroll-behavior-y: contain; 
-        }
-
-        img {
-            content-visibility: auto;
-            contain-intrinsic-size: 300px 300px;
-            image-rendering: -webkit-optimize-contrast;
-            backface-visibility: hidden;
-            transition: opacity 0.3s ease-in;
-        }
-
-        .nav-container::-webkit-scrollbar,
-        .content-area::-webkit-scrollbar,
-        #inicio::-webkit-scrollbar,
-        .section::-webkit-scrollbar {
-            width: 8px;
-            height: 0px; 
-        }
-        
-        .nav-container::-webkit-scrollbar-track,
-        .content-area::-webkit-scrollbar-track,
-        #inicio::-webkit-scrollbar-track,
-        .section::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.5);
-        }
-        
-        .nav-container::-webkit-scrollbar-thumb,
-        .content-area::-webkit-scrollbar-thumb,
-        #inicio::-webkit-scrollbar-thumb,
-        .section::-webkit-scrollbar-thumb {
-            background: var(--neon-blue);
-            border-radius: 10px;
-            box-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        .cursor-star {
-            position: absolute;
-            background: #fff;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1000002;
-            box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
-            animation: trailFade 0.7s linear forwards;
-        }
-
-        @keyframes trailFade {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.2); opacity: 0; }
-        }
-
-        .copy-alert {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(5, 5, 5, 0.95);
-            border: 2px solid var(--neon-blue);
-            padding: 30px;
-            z-index: 10000;
-            text-align: center;
-            box-shadow: 0 0 50px var(--neon-blue);
-            border-radius: 10px;
-            min-width: 300px;
-        }
-
-        .copy-alert h3 {
-            margin: 0 0 10px 0;
-            background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff);
-            background-size: 300%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: moveGradient 4s linear infinite;
-        }
-
-        .copy-alert p {
-            color: #ffffff;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-
-        #intro-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://i.imgur.com/upf8CYl.jpeg') center/cover no-repeat;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', sans-serif;
-            transition: opacity 1s ease, transform 1s ease, visibility 1s;
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .moldura-flutuante {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            border: 3px solid var(--neon-blue);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 0 30px var(--neon-blue);
-            animation: float 3s ease-in-out infinite;
-            margin-bottom: 40px;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .moldura-flutuante img { width: 100%; height: 100%; object-fit: contain; }
-
-        #status-dot {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 20px; 
-            height: 20px; 
-            border-radius: 50%; 
-            border: 3px solid white; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
-            transition: background-color 0.5s ease; 
-            background-color: #9e9e9e;
-            z-index: 10;
-        }
-
-        .btn-entrar, .btn-xat {
-            font-weight: bold; color: white; text-transform: uppercase; border: none; border-radius: 50px; cursor: pointer;
-            background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff);
-            background-size: 300%; animation: moveGradient 4s linear infinite; box-shadow: 0 0 20px rgba(0, 72, 255, 0.6); transition: 0.3s; margin: 5px;
-        }
-
-        .btn-entrar { padding: 15px 60px; font-size: 20px; }
-        .btn-xat { padding: 8px 30px; font-size: 14px; }
-
-        .xat-submenu {
-            display: none; flex-direction: column; gap: 5px; margin-top: 10px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 10px; border: 1px solid var(--neon-blue);
-        }
-
-        .xat-link { color: white; text-decoration: none; font-size: 12px; font-weight: bold; padding: 5px 15px; border-radius: 5px; transition: 0.3s; cursor: pointer; }
-        .xat-link:hover { background: var(--neon-blue); }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-
-        body {
-            background-image: url('https://i.imgur.com/Jb4XOYs.gif'); background-attachment: fixed; background-size: cover; background-position: center;
-            color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;
-            -webkit-user-select: none; user-select: none;
-            overflow-x: hidden;
-        }
-
-        .perfil-header { text-align: center; padding: 20px; border-bottom: 2px solid var(--neon-blue); background: rgba(5, 5, 5, 0.5); z-index: 10; flex-shrink: 0; }
-        .perfil-header h1 {
-            font-size: 2.5rem; margin: 0; background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff);
-            background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 4s linear infinite;
-        }
-
-        .perfil-header p { font-weight: bold; text-transform: uppercase; background: linear-gradient(-45deg, #ffffff, #000000, #ffffff, #000000); background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 5s linear infinite; }
-
-        .main-wrapper { display: flex; flex: 1; overflow: hidden; position: relative; }
-
-        .nav-container {
-            display: flex; flex-direction: column; width: 250px; gap: 8px; padding: 15px; background: rgba(0, 0, 0, 0.4); border-right: 1px solid var(--neon-blue);
-            z-index: 20; overflow-y: auto; overflow-x: hidden; flex-shrink: 0; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); -webkit-overflow-scrolling: touch; touch-action: pan-y;
-        }
-
-        .nav-hidden .nav-container { transform: translateX(-100%); position: absolute; }
-
-        .nav-btn {
-            background: var(--deep-blue-bar); border: 1px solid rgba(0, 38, 138, 0.5); padding: 12px; cursor: pointer;
-            font-weight: bold; text-transform: uppercase; font-size: 15px; transition: all 0.3s ease; color: white; text-align: left; display: block; flex-shrink: 0;
-        }
-
-        .nav-btn:hover, .nav-btn.active { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); background: rgba(0, 72, 255, 0.3); transform: translateX(8px); }
-        .nav-btn span { background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; }
-
-        .content-area { flex: 1; padding: 30px; overflow-y: auto; overflow-x: hidden; z-index: 15; position: relative; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); -webkit-overflow-scrolling: touch; touch-action: pan-y; }
-
-        .btn-voltar { display: none; margin-bottom: 20px; padding: 10px 20px; font-size: 14px; background: var(--deep-blue-bar); border: 1px solid var(--neon-blue); color: white; cursor: pointer; text-transform: uppercase; font-weight: bold; border-radius: 4px; box-shadow: 0 0 10px var(--neon-blue); }
-        .nav-hidden .btn-voltar { display: inline-block; }
-
-        .section { display: none; width: 100%; overflow-x: hidden; }
-        .section.active { display: block; }
-        
-        #inicio, #gifs, #pcback-gif, #pstyle-gif, #pcback-est, #pstyle-est, #fundos, #player { 
-            max-height: 100%; 
-            overflow-y: auto; 
-            overflow-x: hidden;
-            padding-right: 5px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .grid-container { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-        .grid-gifs { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-        
-        .card { background: var(--card-bg); border: 1px solid rgba(34, 34, 34, 0.5); border-radius: 4px; overflow: hidden; text-align: center; cursor: zoom-in; transition: 0.3s; }
-        .card:hover { border-color: var(--neon-blue); transform: scale(1.05); box-shadow: 0 0 25px var(--neon-blue); background: rgba(17, 17, 17, 0.8); }
-        .card img { width: 100%; display: block; opacity: 0; }
-        .card .label { padding: 5px; font-size: 10px; text-transform: uppercase; font-weight: bold; color: #fff; background: rgba(0,0,0,0.5); }
-
-        .info-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) {
-            .info-cards { grid-template-columns: 1fr; }
-            .info-card.full-width { grid-column: 1; }
-        }
-
-        .info-card { background: var(--card-bg); border: 1px solid rgba(34, 34, 34, 0.5); padding: 20px; border-radius: 4px; transition: all 0.3s ease; word-wrap: break-word; }
-        .info-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); transform: scale(1.01); background: rgba(17, 17, 17, 0.7); }
-        .info-card.full-width { grid-column: 1 / span 2; }
-        .info-card h3 { margin-top: 0; text-transform: uppercase; background: linear-gradient(-45deg, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 4s linear infinite; }
-
-        .marquee-container { background: var(--deep-blue-bar); border: 1px solid rgba(0, 38, 138, 0.5); width: 100%; overflow: hidden; margin-bottom: 20px; padding: 15px 0; position: relative; display: flex; align-items: center; }
-        .marquee-content { display: inline-block; white-space: nowrap; position: absolute; will-change: transform; animation: linear-scroll-inside 15s linear infinite; }
-        .texto-animado { font-weight: bold; font-size: 22px; background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; padding: 0 10px; }
-
-        @keyframes linear-scroll-inside { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        @keyframes moveGradient { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
-
-        .player-container { max-width: 400px; margin: 20px auto; background: var(--card-bg); border: 2px solid var(--neon-blue); border-radius: 8px; padding: 20px; box-shadow: 0 0 20px var(--neon-blue); text-align: center; position: relative; z-index: 10; }
-        .track-marquee { width: 100%; overflow: hidden; white-space: nowrap; background: rgba(0, 0, 0, 0.3); padding: 10px 0; margin-bottom: 20px; position: relative; height: 30px; display: flex; align-items: center; }
-        .track-name, .vol-label { display: inline-block; font-weight: bold; text-transform: uppercase; background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; }
-        .track-name { position: absolute; will-change: transform; animation: linear-scroll-inside 20s linear infinite, moveGradient 3s linear infinite; }
-
-        .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.95); justify-content: center; align-items: center; }
-        .modal-content { max-width: 80%; max-height: 80%; border: 2px solid var(--neon-blue); }
-
-        .exclusive-footer { margin-top: auto; padding-top: 15px; text-align: center; font-size: 9px; font-weight: bold; text-transform: uppercase; background: linear-gradient(to right, #0048FF, #ffffff, #0048FF, #ffffff); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: moveGradient 3s linear infinite; }
-    </style>
-</head>
-<body oncontextmenu="showAlert(); return false;">
-
-    <div id="copyright-alert" class="copy-alert">
-        <h3>COPYRIGHT - ACESSO PROIBIDO</h3>
-        <p>Propriedade de Gabr (1777777)</p>
-    </div>
-
-    <div id="intro-screen">
-        <div class="moldura-flutuante">
-            <img src="https://i.imgur.com/pKuY3f8.gif">
-            <div id="status-dot" title="Verificando status..."></div>
-        </div>
-        <button class="btn-entrar" onclick="entrarGaleria()">Entrar</button>
-        <button class="btn-xat" onclick="toggleXatMenu()">Xat</button>
-        <div id="xat-menu" class="xat-submenu">
-            <div onclick="irPara('https://xat.com/Butecopremium')" class="xat-link">Xat Buteco</div>
-            <div onclick="irPara('https://xat.com/TUGA')" class="xat-link">Xat TUGA</div>
-            <div onclick="irPara('https://xat.com/trade')" class="xat-link">Xat Trade</div>
-        </div>
-    </div>
-
-    <div class="perfil-header">
-        <h1>GALERIA DE GIFS</h1>
-        <p>Gabr (1777777)</p>
-    </div>
-
-    <div class="main-wrapper" id="mainWrapper">
-        <div class="nav-container">
-            <button class="nav-btn active" onclick="showTab('inicio')"><span>Início</span></button>
-            <button class="nav-btn" onclick="showTab('gifs')"><span>GIFS</span></button>
-            <button class="nav-btn" onclick="showTab('pcback-gif')"><span>PCBACK GIFS</span></button>
-            <button class="nav-btn" onclick="showTab('pstyle-gif')"><span>PSTYLE GIFS</span></button>
-            <button class="nav-btn" onclick="showTab('pcback-est')"><span>PCBACK ESTÁTICO</span></button>
-            <button class="nav-btn" onclick="showTab('pstyle-est')"><span>PSTYLE ESTÁTICO</span></button>
-            <button class="nav-btn" onclick="showTab('fundos')"><span>FUNDOS</span></button>
-            <div class="nav-btn" onclick="irPara('https://gabr1777777.github.io/GaleriaXatspace/')"><span>XATSPACE</span></div>
-            <button class="nav-btn" onclick="showTab('player')"><span>Player</span></button>
-            <div class="exclusive-footer">Galeria exclusiva 2026 - By: Gabr (1777777)</div>
-        </div>
-
-        <div class="content-area">
-            <button class="btn-voltar" onclick="voltarMenu()">« Voltar para o Menu</button>
-            
-            <div id="inicio" class="section active">
-                <div class="info-cards">
-                    <div class="info-card full-width"><h3>Sell ID 10 Digts  (Never used)</h3><p id="ids-venda">(SOLD 1553333003), (SOLD 1553333005), 1553333013, 1553333024, 1553333040, 1553333505, 1553333903, 1553333027, 1553333484, 1553333494, 1553333579, 1549200800, 1549200900, (SOLD 1549203020), 1553350006, 1553342014, 1553350001, 1553349911, 1553350010, 1553350019, 1553350022, 1553350080, 1553358001, 1553358004, 1549200788, 1549200822, 1549200844, 1557799002, 1553366005, 1549200844, 1553347776, 1529199110, 1529199070, 1529199294, 1529199883, 1533393277, 1533393300, 1533393338, (SOLD 1533393573), 1533393580, 1529200133, 1529202490, (SOLD 1529202505), 1529202530, 1529204010, 1533394241, 1533393639, 1529202425, 1529202400, 1533394373, 1533394323, 1533394241, 1529199885, 1533393635, 1533393595, 1533393141, 1533393400, 1533393344, 1533393318, 1547821112, 1547821110, 1552015343, 1552015251, 1547820900, 1552015200, 1552015147, 1552015145, 1557799021, 1557799033, 1557788921, 1557776683, 1557733214, 1557771518, 1549303238, 1553473771, 1553382335, 1553379909, 1553377996, 1553368939, 1553367700, 1553366020, 1549171706, 1553361002, 1549208099, 1549202628, 1549202625, 1553396919, 1549202188, 1549202166, 1549201767, 1549201765, 1549201363, 1549201355, 1549201141, 1549201138, 1549201022, 1549200949, 1549200870, 1549200822, 1553358009, 1553358007, 1553356878, 1549155545, 1553350025, 1553349904, 1549155586, 1549155570, 1549155560, 1553347799, 1553347788, 1553347779, 1553345350, 1553345344, 1553345337, 1553345060, 1553344044, 1553343736, 1553343733, 1553343723, 1553343013, 1553343001, 1553342448, 1553339348, 1553339563, 1553339558, 1553339371, 1553339387, 1553339366, 1553338668, 1553338633, 1553339355, 1553338688, 1553338090, 1553337479, 1553335233, 1553335220, 1553333908, 1553333491, 1553333464, 1553332927, 1553327338, 1553327323, 1553322031, 1553329282, </p></div>
-                </div>
+<main id="main-content" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 transition-all duration-1000 ease-out my-auto pb-6">
+      <section class="md:col-span-5 flex flex-col gap-4 md:gap-6">
+        <div class="glass-card rounded-3xl p-5 md:p-6 relative overflow-hidden group cursor-hover">
+          <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[var(--light-pink)] to-transparent opacity-50"></div>
+          <div class="text-center mb-6 mt-2">
+            <h1 class="text-4xl md:text-5xl font-bold py-2 title-glow select-none">
+              ⸄ 𝓝𝓪𝓻𝓪 ๋ ࣭ ⭑
+            </h1>
+            <p class="text-[var(--light-pink)] text-[10px] md:text-xs tracking-[0.3em] uppercase mt-2 font-semibold border-b border-[var(--light-pink)]/20 pb-3 inline-block">
+              Nara (252987266)
+            </p>
+          </div>
+          <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden mb-6 border border-[var(--light-pink)]/20 shadow-2xl">
+            <img src="https://xatimg.com/image/dCvg0UkAcsd1.gif?auto=format&amp;fit=crop&amp;w=800&amp;q=80" onerror="this.src='https://xatimg.com/image/dCvg0UkAcsd1.gif?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+            <div class="absolute bottom-3 right-3 bg-[var(--deep-purple)]/80 backdrop-blur-md px-2 py-1 rounded-full border border-[var(--light-pink)]/30 flex items-center gap-1.5">
+              <span class="text-[9px] font-bold text-white uppercase tracking-wider">Online</span>
             </div>
-
-            <div id="gifs" class="section"></div>
-            <div id="pcback-gif" class="section"></div>
-            <div id="pstyle-gif" class="section"></div>
-            <div id="pcback-est" class="section"></div>
-            <div id="pstyle-est" class="section"></div>
-            <div id="fundos" class="section"></div>
-
-            <div id="player" class="section">
-                <div class="player-container">
-                    <div class="track-marquee"><span id="trackName" class="track-name">Selecione uma música...</span></div>
-                    <div style="display:flex; justify-content:center; align-items:center; gap:10px;">
-                        <button class="nav-btn" style="padding:10px" onclick="prevTrack()">«</button>
-                        <button class="nav-btn" style="padding:10px" id="playBtn" onclick="togglePlay()">▶</button>
-                        <button class="nav-btn" style="padding:10px" onclick="nextTrack()">»</button>
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                            <span class="vol-label" style="font-size: 10px;">Vol</span>
-                            <button class="nav-btn" style="padding:10px 5px; width:38px; text-align:center; font-size:11px;" id="volBtn" onclick="cycleVolume()">50%</button>
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <div class="flex justify-center pt-2 pb-4">
+            <div class="group/stat text-center">
+              <span id="like-counter" class="block text-4xl font-bold text-white drop-shadow-[0_0_10px_var(--light-pink)] transition-transform duration-200">143</span> <span class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 block">Likes</span>
             </div>
+          </div>
+          <div class="flex gap-2 md:gap-3">
+            <button id="like-btn" onclick="addLike(event)" class="cursor-hover flex-1 btn-luxury py-2.5 md:py-3 rounded-xl text-xs font-bold tracking-widest uppercase shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 relative overflow-visible">Like</button> <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="cursor-hover w-10 h-10 md:w-12 md:h-12 glass-card rounded-xl flex items-center justify-center hover:bg-[var(--light-pink)]/10 transition-colors border border-[var(--light-pink)]/20 group/btn"></a> <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" class="cursor-hover w-10 h-10 md:w-12 md:h-12 glass-card rounded-xl flex items-center justify-center hover:bg-[var(--light-pink)]/10 transition-colors border border-[var(--light-pink)]/20 group/btn"></a>
+          </div>
         </div>
-    </div>
-
-    <div id="modalZoom" class="modal" onclick="closeZoom()"><img class="modal-content" id="imgZoom"></div>
-
-    <script>
-        document.addEventListener('mousemove', function(e) {
-            const star = document.createElement('div');
-            star.classList.add('cursor-star');
-            star.style.left = e.pageX + 'px'; star.style.top = e.pageY + 'px';
-            document.body.appendChild(star);
-            setTimeout(() => { star.remove(); }, 700);
-        });
-
-        function irPara(url) { window.open(url, '_blank'); }
-
-        async function updateStatus() {
-            try {
-                const res = await fetch('https://illuxat.com/api/online/Gabr');
-                const json = await res.json();
-                const dot = document.getElementById('status-dot');
-                const isOnline = json.data?.status?.toLowerCase() === 'online';
-                
-                if (isOnline) {
-                    dot.style.backgroundColor = "#22c55e"; 
-                    dot.title = "Online no xat";
-                } else {
-                    dot.style.backgroundColor = "#ef4444"; 
-                    dot.title = "Offline no xat";
-                }
-            } catch (e) {
-                console.error("Erro ao carregar status:", e);
-                document.getElementById('status-dot').style.backgroundColor = "#9e9e9e";
-            }
-        }
-        setInterval(updateStatus, 60000);
-
-        function toggleXatMenu() {
-            const menu = document.getElementById('xat-menu');
-            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        function showAlert() {
-            const alertBox = document.getElementById('copyright-alert');
-            alertBox.style.display = 'block';
-            setTimeout(() => { alertBox.style.display = 'none'; }, 2500);
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83) || e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73)) {
-                showAlert(); e.preventDefault(); return false;
-            }
-        });
-
-        // Player de Música
-        const playlist = [
-            { name: "Neoni - Carry on Wayward Son", url: "https://www.dropbox.com/scl/fi/55a1awegvjnlt8i1atia9/Neoni-Carry-on-Wayward-Son.mp3?rlkey=8v9te2igxtxt7p40xlhlls697&st=ths9my02&raw=1" },
-            { name: "Lukas Graham - 7 Years", url: "https://www.dropbox.com/scl/fi/e49kcnpxz99aej767r3gn/Lukas-Graham-7-Years.mp3?rlkey=7q32myx2mhm1xqnl9v82us6v1&st=j0fknfqk&raw=1" },
-            { name: "OneRepublic - Counting Stars", url: "https://www.dropbox.com/scl/fi/0oynubgpuxx3098p8lgn9/OneRepublic-Counting-Stars.mp3?rlkey=up1vcphxao6714ko2kc10b10z&st=4qkuh835&raw=1" },
-            { name: "The Sound of Silence – Rising to the Night", url: "https://dl.dropboxusercontent.com/scl/fi/2y9zhx5zjsdxg3zljc2f9/sound-of-silence.mp3?rlkey=88zg0td3loy40uxmcm9rnk1jt&raw=1" },
-            { name: "Punic NTPV GodDamn e Phonk King - Peito Cheio", url: "https://www.dropbox.com/scl/fi/p20gy4mcae9fjzs4ksv7x/Punic-NTPV-GodDamn-e-Phonk-King-Peito-Cheio.mp3?rlkey=nv0bi08m6iumyj68qxc5ucdty&st=uj8mewni&raw=1" },
-            { name: "Teddy Swims - Lose Control", url: "https://www.dropbox.com/scl/fi/o3qam7tz7avp9zjmgr52m/Teddy-Swims-Lose-Control.mp3?rlkey=im86yd8l4ftrn43igvtueij2b&st=779tsr5s&raw=1" }
-        ];
-
-        let currentTrack = 0; 
-        const audio = new Audio();
-        audio.volume = 0.5;
-
-        function cycleVolume() {
-            if (audio.volume === 0.0) { audio.volume = 0.5; document.getElementById('volBtn').innerText = "50%"; }
-            else if (audio.volume === 0.5) { audio.volume = 1.0; document.getElementById('volBtn').innerText = "100%"; }
-            else { audio.volume = 0.0; document.getElementById('volBtn').innerText = "0%"; }
-        }
-
-        function entrarGaleria() {
-            const intro = document.getElementById('intro-screen');
-            intro.style.opacity = '0'; intro.style.transform = 'scale(1.1)'; intro.style.visibility = 'hidden';
-            setTimeout(() => { intro.style.display = 'none'; }, 1000); 
-            togglePlay(); 
-        }
-
-        function showTab(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const target = document.getElementById(id);
-            if (target) {
-                target.classList.add('active');
-                target.scrollTop = 0; 
-                document.querySelector('.content-area').scrollTop = 0;
-            }
-            // Manter botão ativo
-            const buttons = document.querySelectorAll('.nav-btn');
-            buttons.forEach(btn => {
-                if(btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(id)) {
-                    btn.classList.add('active');
-                }
-            });
-
-            if (window.innerWidth <= 768) { document.getElementById('mainWrapper').classList.add('nav-hidden'); }
-        }
-
-        function voltarMenu() { document.getElementById('mainWrapper').classList.remove('nav-hidden'); }
-        function loadTrack(i) { audio.src = playlist[i].url; document.getElementById('trackName').innerText = playlist[i].name; }
-        function togglePlay() { if(audio.paused) { if(!audio.src) loadTrack(currentTrack); audio.play().catch(e => {}); document.getElementById('playBtn').innerText='||'; } else { audio.pause(); document.getElementById('playBtn').innerText='▶'; } }
-        function nextTrack() { currentTrack=(currentTrack+1)%playlist.length; loadTrack(currentTrack); audio.play(); document.getElementById('playBtn').innerText='||'; }
-        function prevTrack() { currentTrack=(currentTrack-1+playlist.length)%playlist.length; loadTrack(currentTrack); audio.play(); document.getElementById('playBtn').innerText='||'; }
-        audio.onended = nextTrack;
-
-        function openZoom(src) { document.getElementById("imgZoom").src = src; document.getElementById("modalZoom").style.display = "flex"; }
-        function closeZoom() { document.getElementById("modalZoom").style.display = "none"; }
-
-        function render() {
-            updateStatus();
-            
-            const gifSec = document.getElementById('gifs');
-            const dataGifs = [
-                { marquee: "✧ BLUFFTITLER - ONLY NAME - 250 XATS ✧", prefix: "Name - ", ids: ["bidwh1D", "wR2NpTV", "IMrOUcP", "Hdi04Sg", "OcGaTXA", "wJZiwkG", "jDgxhBQ", "USQgVk8", "4bhAWa5", "0LL3muu"] },
-                { marquee: "✧ BLUFFTITLER - NAME + PHOTO - 350 XATS ✧", prefix: "Bluff - ", ids: ["F0b4mnJ", "65bzz5V", "ZetkVFF", "JqzxOwt", "NK9Z8rU", "RNIlFI3", "bSmUjsQ", "R6klF5K", "cgyGLHQ", "ctF1vyH", "Ge90Xy7", "7Z8xEC8", "G8HFkiG", "sh7u3UM", "y0WgmxJ", "Vvw2SMU", "uoNJlEe"] },
-                { marquee: "✧ CANVA - NAME + PHOTO - 300 XATS ✧", prefix: "Canva - ", ids: ["hWVyLox", "Uxlzu5C", "Crt716T", "xo4npxf", "jUG54d4", "gMQ3Fo9", "xvM1ixb", "cwRIh51", "db8sdi9", "nRJQ0BB"] },
-                { marquee: "✧ AFTEREFECTS - NAME + PHOTO - 400 XATS ✧", prefix: "After - ", ids: ["S5pXaVI", "qQB5w4C", "QlniJvg", "shyBpPS", "LzTvWk4", "aLBEkKq", "kJmAoul", "uOwOmwM", "u0Cse5Q", "ioDaClP", "PD03EYd", "HVFwoO9", "ueBRxvV", "XkwoKCf", "ULcq67R", "afxBCK8", "NKjJIGs", "xDhKvCC", "vvcOaEK", "ups9FgX", "JeY6A7M", "zDyoEgZ", "0FklDw9", "FX6gdFw", "V3LO0YG", "r9yfJNZ", "R3sO6Dv", "P8DpN4L", "fRfZuO7", "BPgPihm", "5HxfNaB", "FILAVQP", "5IoR515", "KUQ1WsX", "ZuaO9n5", "eYUpRds", "EkhA4lw", "ufOP9QG", "w2URYst", "1uMiE0k", "JQaMJ7U", "JeVcLkk", "un368jG", "LaClQL2", "l3Az3Nz", "8ME12WB", "SWSOcvf", "HizA7mV", "HnIaNDX", "bStEaxn", "CgwrMHf", "MtDrchh", "P4UINMY", "F0ujERT", "lHdM40L", "vWKX5Fb", "UHq0679", "2tRaU1S", "XQJ8R9h", "n4sAIhn", "LaJAK5L", "RIDkkSc", "ogHzac1", "aV63fjn", "tSuJOKg", "MxeKAfQ", "A4chzU3", "bAXpFow", "d1wToYT", "IXCqwlR", "kv1EWDW", "FIulKIF", "qLhMZAE", "R9nl6Ch", "A7x7PhX", "XU4klcy", "DRUBV0y", "geacP52", "lNh2rdL", "rS3PItx", "AzuyKg4", "aT6Rk4H", "0uZHgJW", "cyLfXAp", "omfCtkk", "lbauLSs", "s1rQrgg", "WNwfYTh", "XO8NzcJ", "6orVlLG", "Ocbami8", "oiVshBX", "bIP35gN", "Lwk0DWm", "N0FdNiy", "R7sOEoQ", "jrQMS1Q", "DA0VYtJ", "k21g4fQ"] },
-                { marquee: "✧ AFTEREFECTS - NAME + (2) PHOTO - 500 XATS ✧", prefix: "Love - ", ids: ["NnEIlrv", "8hrgq1D", "MqnmO8R", "oRvL0X3", "luwMPoD"] },
-                { marquee: "✧ AFTEREFECTS - DJ - NAME + PHOTO 450 XATS ✧", prefix: "DJ - ", ids: ["Bj6WFKZ", "GGrjZnE", "jJefFUv", "tesP8Me", "VRBqDtS", "WnnPvsU"] },
-                { marquee: "✧ AFTEREFECTS - HALLOWEEN - NAME + PHOTO 450 XATS ✧", prefix: "Hallo - ", ids: ["tYerofL", "DhJDXHE", "w3rSXf6", "9nHfmtZ", "61Eafym", "4ON7Gu0"] },
-                { marquee: "✧ AFTEREFECTS - CHRISTMAS - NAME + PHOTO 450 XATS ✧", prefix: "Xmas - ", ids: ["79ymrS9", "FOyoZu1", "rIs0a2w", "4USFEwb", "5vvU8qn"] },
-                { marquee: "✧ PHOTOSCAPE - (1) PHOTO - 100 XATS (2) PHOTOS - 200 XATS (3) PHOTOS - 300 XATS ✧", prefix: "Parpadeo - ", ids: ["bXTTG5V", "MdemxH0", "VpU6eOY", "NUIGQ3f", "NP25oCb", "mXHqKwc", "bKcj9xf"] }
-            ];
-
-            gifSec.innerHTML = "";
-            dataGifs.forEach(sec => {
-                let h = `<div class="marquee-container"><div class="marquee-content"><span class="texto-animado">${sec.marquee}</span></div></div><div class="grid-gifs">`;
-                sec.ids.forEach((id, i) => { 
-                    h += `<div class="card" onclick="openZoom('https://i.imgur.com/${id}.gif')"><img data-src="https://i.imgur.com/${id}.gif" class="lazy"><div class="label">${sec.prefix}${i+1}</div></div>`; 
-                });
-                h += `</div>`; gifSec.innerHTML += h;
-            });
-
-            const configs = [
-                { id: 'pcback-gif', marquee: "✧ PCBACK GIF  - 450 XATS ✧", label: "PCBack Gif", 
-                    urls: [
-                        'SFnk7A6.gif', 'KKY2zqU.gif', 'fmhynyY.gif', '28xDTg0.gif', '9R35WMu.gif', 'kSK0E1f.gif', 'l2y5xFa.gif', 'ZDbAiNK.gif', 'fRmpR5e.gif', 'TUdO2r8.gif',
-                        'clgE48o.gif', 'gWgkiku.gif', 'vS55bUO.gif', 'Xib4qKf.gif', 'pcGjNGM.gif', 'n4JMxfr.gif', 'XrJTb1e.gif', 'dyvcHuK.gif', 'l8jI2ia.gif', 'UlnuUQG.gif',
-                        'opekB2r.gif', '0uvOiJm.gif', '2kEbWrY.gif', '07m3bwV.gif', 'D2JnSmE.gif'
-                    ] 
-                },
-                { id: 'pstyle-gif', marquee: "✧ PSTYLE GIF - 350 XATS ✧", label: "Pstyle Gif", 
-                    urls: [
-                        'rUIzfWU.gif', 'dGfJDfh.gif', 'ZXBA6F1.gif', 'dImC226.gif', '4P6kTS6.gif', 'E6fZa1k.gif', 'iaCw0P8.gif', '3mC3Qgh.gif', 'jSyWPEs.gif', 'vLnBaqA.gif',
-                        'LmDTRY5.gif', 'PhxEvbL.gif', '1pMwbMm.gif', '7KedrNM.gif', 'yqLPTKa.gif', 'FoW5FXN.gif', 'vWDVot8.gif', 'RJHbbfm.gif', 'PHiebbT.gif', 'Rcqw2MT.gif',
-                        'whcMVzN.gif', 'zgC18pX.gif'
-                    ] 
-                },
-                { id: 'pcback-est', marquee: "✧ PCBACK ESTÁTICO - 300 XATS ✧", label: "PCBack", 
-                    urls: [
-                        'OyX4Jwt.png', 'dbSy2Rf.png', 'uBp1ypU.png', '83Glu7j.png', 'QtSYA09.png', 'WDKosnm.png', 'WfVIivT.png', 'ojcJMIb.png', 'Dn05p8R.png', '5iJRrrF.png',
-                        'uBp1ypU.png', '98FssR8.png', 'MxVwAsp.png', 'RxlqG4b.png', 'TdAGQpt.png'
-                    ] 
-                },
-                { id: 'pstyle-est', marquee: "✧ PSTYLE ESTÁTICO - 250 XATS ✧", label: "Pstyle", 
-                    urls: [
-                        'Ii4pk4g.png', 'm2Ew85b.png', 'zlcL7Dh.png', 'E6C3t04.png', '6PUSQBo.png', 'Zpv9tET.png', 'eqKUD5c.png', 'zTFcRvU.png', 'Sl2JhZi.png', '3rUpT2u.png'
-                    ] 
-                },
-                { id: 'fundos', marquee: "✧ FUNDOS - 700 XATS ✧", label: "FUNDO", 
-                    urls: [
-                        'eJtGG3D.png', 'Q8XwtQZ.png', '6phSrhR.png', 'yeQZf5S.png', 'RDsR3k5.png', 'EXCVWDO.png', 'umcaiMq.png', 'hzjUj8q.png', 'zQj5X8P.png', 'OojsaCj.png',
-                        'EHK0Ik0.png', 'sSfzBLf.png', 'J6tAgOm.png', 'hqxUYUr.png', 'COfEeEX.png', 'BKGUII2.png'
-                    ] 
-                }
-            ]
-
-            configs.forEach(c => {
-                const target = document.getElementById(c.id);
-                if (target) {
-                    let html = `<div class="marquee-container"><div class="marquee-content"><span class="texto-animado">${c.marquee}</span></div></div><div class="grid-container">`;
-                    c.urls.forEach((img, i) => {
-                        html += `<div class="card" onclick="openZoom('https://i.imgur.com/${img}')">
-                                 <img data-src="https://i.imgur.com/${img}" class="lazy"><div class="label">${c.label} - ${i+1}</div></div>`;
-                    });
-                    target.innerHTML = html + `</div>`;
-                }
-            });
-
-            // Ativar Observer de Imagens
-            const lazyImages = document.querySelectorAll('img.lazy');
-            lazyImages.forEach((img, idx) => {
-                if(idx < 6) {
-                    img.src = img.dataset.src;
-                    img.style.opacity = "1";
-                } else {
-                    window.observer.observe(img);
-                }
-            });
-        }
-        window.onload = render;
-    </script>
-</body>
-</html>
+        <div class="glass-card rounded-3xl p-4 md:p-5 flex items-center gap-3 md:gap-4 cursor-hover border-l-2 border-l-[var(--light-pink)]">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border border-[var(--light-pink)] p-0.5 shrink-0">
+            <img src="https://xatimg.com/image/3Q617uMtIrf3.png?auto=format&amp;fit=crop&amp;w=200&amp;q=80" onerror="this.src='https://xatimg.com/image/3Q617uMtIrf3.png?auto=format&amp;fit=crop&amp;w=200&amp;q=80'" class="w-full h-full object-cover rounded-full">
+          </div>
+          <div>
+            <h3 class="text-xs md:text-sm font-bold text-white flex items-center gap-2">
+              Nara<img src="https://flagpedia.net/data/flags/emoji/twitter/256x256/br.png" srcset="https://flagpedia.net/data/flags/emoji/twitter/256x256/br.png 2x" width="16" height="12" alt="México" class="rounded-[2px] opacity-80">
+            </h3>
+            <p class="text-[10px] md:text-xs text-gray-400 mt-0.5">
+              ~/: <span class="text-[var(--light-pink)]">Oque me Acalma</span> &amp; <span class="text-[#a47ba8]"> ^.^ Trás Paz</span>.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="md:col-span-7 flex flex-col gap-4 md:gap-6">
+        <div class="glass-card rounded-3xl p-6 md:p-8 relative overflow-hidden">
+          <div class="flex items-start justify-between mb-6 relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <h2 class="text-[10px] md:text-xs font-bold text-[var(--light-pink)] uppercase tracking-[0.2em]">
+                  Playlist
+                </h2>
+              </div>
+              <p class="text-xl md:text-2xl font-serif italic text-white/90">
+                 Vibes Fofuxa
+              </p>
+            </div>
+            <div class="flex items-end gap-1 h-6 md:h-8 paused" id="visualizer">
+              <div class="equalizer-bar"></div>
+              <div class="equalizer-bar"></div>
+              <div class="equalizer-bar"></div>
+              <div class="equalizer-bar"></div>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-6 items-center relative z-10 text-center sm:text-left">
+            <div class="w-28 h-28 md:w-36 md:h-36 rounded-full p-1 border border-[var(--light-pink)]/30 relative flex-shrink-0 mx-auto sm:mx-0">
+              <div class="w-full h-full rounded-full overflow-hidden relative">
+                <img id="album-art" src="https://xatimg.com/image/AqZ2buQJOoBL.png?auto=format&amp;fit=crop&amp;w=300&amp;q=80" class="w-full h-full object-cover animate-[spin_12s_linear_infinite]" style="animation-play-state: paused;">
+                <div class="absolute inset-0 bg-black/10"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#25092E] rounded-full border border-[var(--light-pink)]"></div>
+              </div>
+            </div>
+            <div class="flex-1 w-full min-w-0">
+              <div class="mb-4">
+                <h3 id="song-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-[var(--light-pink)] to-white truncate">Stressed Out</h3>
+                <p id="artist-name" class="text-xs text-[var(--purple-mid)] font-medium mt-1">twenty one pilots</p>
+              </div>
+              <div class="w-full bg-[var(--deep-purple)]/50 rounded-full h-1 mb-2 cursor-pointer group tap-area border border-[var(--light-pink)]/10" id="progress-container">
+                <div id="progress-bar" class="bg-gradient-to-r from-[var(--purple-mid)] to-[var(--light-pink)] h-1 rounded-full w-0 relative group-hover:h-1.5 transition-all duration-300" style="width: 2.1303%;"></div>
+              </div>
+              <div class="flex justify-between text-[9px] text-gray-400 mb-4 font-mono">
+                <span id="current-time">0:09</span><span id="duration">7:18</span>
+              </div>
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-6">
+                  <button onclick="togglePlay()" class="cursor-hover w-12 h-12 rounded-full btn-luxury flex items-center justify-center text-[var(--light-pink)] shadow-xl hover:scale-105 active:scale-95 transition-transform"><i id="play-icon" class="fa-solid fa-play ml-1"></i></button>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-center mt-3 sm:mt-0">
+                  <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.7" class="w-24">
+                </div>
+              </div>
+            </div>
+          </div><audio id="audio-player" ontimeupdate="updateProgress()" onended="nextSong()" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"></audio>
+        </div>
+        <div class="glass-card rounded-2xl p-4 relative group/slider border border-[var(--light-pink)]/10">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h3 class="text-[10px] font-bold text-[var(--light-pink)] uppercase tracking-widest">
+              Galería
+            </h3>
+          </div>
+          <div id="gallery-slider" class="gallery-scroll flex overflow-x-auto gap-4 snap-x snap-mandatory scroll-smooth pb-2 -mx-2 px-2">
+            <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img">
+              <img src="https://xatimg.com/image/p8kdi79qj3e5.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1618331835717-801e976710b2?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            </div>
+            <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img">
+              <img src="https://xatimg.com/image/uFrdfATblYeM.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            </div>
+             <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img">
+              <img src="https://u.cubeupload.com/Nara/20210525172624.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            </div>
+            <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img">
+              <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            </div>
+            <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img">
+              <img src="https://images.unsplash.com/photo-1517457210348-703079e57d4b?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1517457210348-703079e57d4b?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            </div>
+            <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img">
+              <img src="https://xatimg.com/image/XpZfU3uRE3Qi.png?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            </div>
+             <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img">
+              <img src="https://xatimg.com/image/XpZfU3uRE3Qi.png?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
+            </div>
+          </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 md:p-8 text-center border-t border-[var(--light-pink)]/20">
+          <p class="font-serif italic text-gray-400 text-base md:text-lg leading-relaxed">
+            "Entre risos, silêncios e lembranças, a vida revela suas cores mais 
+            intensas quando nos permitimos sentir de verdade.."<br>
+            <span class="text-[var(--light-pink)] font-bold">Fofuxa.</span> (Nara)"
+          </p>
+          <div class="mt-4 flex justify-center gap-3"></div>
+        </div>
+      </section>
+    </main>
