@@ -105,7 +105,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 relative">
+<body class="min-h-screen flex flex-col items-center justify-between p-4 relative">
 
   <!-- AVISO DE ACESSO PROIBIDO -->
   <div id="forbidden-alert" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-[var(--deep-purple)]/90 border border-[var(--light-pink)] text-[var(--light-pink)] px-6 py-3 rounded-2xl shadow-2xl backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 font-mono text-xs uppercase tracking-widest">
@@ -136,6 +136,16 @@
     </button>
   </div>
 
+  <!-- MODAL DE VISUALIZAÇÃO DE IMAGEM (LIGHTBOX) -->
+  <div id="image-modal" class="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4" onclick="closeImageModal(event)">
+    <button onclick="closeImageModal(event, true)" class="absolute top-6 right-6 text-white/80 hover:text-[var(--light-pink)] text-3xl font-bold transition-colors z-[130] w-12 h-12 flex items-center justify-center rounded-full bg-black/40 border border-white/10" aria-label="Fechar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="relative max-w-4xl max-h-[90vh] flex items-center justify-center overflow-hidden rounded-2xl border border-[var(--light-pink)]/30 shadow-2xl">
+      <img id="modal-img" src="" alt="Imagem Ampliada" class="max-w-full max-h-[85vh] object-contain rounded-xl transform scale-95 transition-transform duration-300">
+    </div>
+  </div>
+
   <!-- CONTEÚDO PRINCIPAL DA PÁGINA -->
   <main id="main-content" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 transition-all duration-1000 ease-out my-auto pb-6 opacity-0 pointer-events-none transform scale-95">
     
@@ -155,7 +165,7 @@
           </p>
         </div>
 
-        <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden mb-6 border border-[var(--light-pink)]/20 shadow-2xl">
+        <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden mb-6 border border-[var(--light-pink)]/20 shadow-2xl cursor-pointer" onclick="openImageModal('https://xatimg.com/image/dCvg0UkAcsd1.gif?auto=format&fit=crop&w=800&q=80')">
           <img 
             src="https://xatimg.com/image/dCvg0UkAcsd1.gif?auto=format&amp;fit=crop&amp;w=800&amp;q=80" 
             onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" 
@@ -280,7 +290,7 @@
         <audio id="audio-player" ontimeupdate="updateProgress()" src="https://www.dropbox.com/scl/fi/90jrl848zrgphx9wltzi6/Toosii-Favorite-Song.mp3?rlkey=qs5094m9ftmih12yivastg4gh&amp;st=7s1lqr7s&amp;raw=1"></audio>
       </div>
 
-      <!-- Galeria -->
+      <!-- Galeria com Lightbox -->
       <div class="glass-card rounded-2xl p-4 relative border border-[var(--light-pink)]/10">
         <div class="flex items-center justify-between mb-3 px-1">
           <h3 class="text-[10px] font-bold text-[var(--light-pink)] uppercase tracking-widest">
@@ -289,27 +299,27 @@
         </div>
         <div id="gallery-slider" class="gallery-scroll flex overflow-x-auto gap-4 snap-x snap-mandatory scroll-smooth pb-2 -mx-2 px-2">
           
-          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
+          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start" onclick="openImageModal(this.querySelector('img').src)">
             <img src="https://xatimg.com/image/p8kdi79qj3e5.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1618331835717-801e976710b2?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 1" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
-          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
+          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start" onclick="openImageModal(this.querySelector('img').src)">
             <img src="https://xatimg.com/image/uFrdfATblYeM.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 2" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
-          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
+          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start" onclick="openImageModal(this.querySelector('img').src)">
             <img src="https://u.cubeupload.com/Nara/20210525172624.jpg?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 3" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
-          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
+          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start" onclick="openImageModal(this.querySelector('img').src)">
             <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&amp;fit=crop&amp;w=600&amp;q=80" alt="Foto 4" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
-          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
+          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start" onclick="openImageModal(this.querySelector('img').src)">
             <img src="https://images.unsplash.com/photo-1517457210348-703079e57d4b?auto=format&amp;fit=crop&amp;w=600&amp;q=80" alt="Foto 5" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
-          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start">
+          <div class="gallery-item relative shrink-0 w-[85%] sm:w-[48%] aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group/img snap-start" onclick="openImageModal(this.querySelector('img').src)">
             <img src="https://xatimg.com/image/XpZfU3uRE3Qi.png?auto=format&amp;fit=crop&amp;w=600&amp;q=80" onerror="this.src='https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&amp;fit=crop&amp;w=600&amp;q=80'" alt="Foto 6" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110">
           </div>
 
@@ -327,7 +337,43 @@
     </section>
   </main>
 
+  <!-- RODAPÉ DA PÁGINA -->
+  <footer class="w-full text-center py-4 z-10">
+    <p class="text-[var(--light-pink)] text-xs md:text-sm italic tracking-widest font-mono opacity-80 hover:opacity-100 transition-opacity">
+      ©2026 <i>Design iiCarvÃozim</i>
+    </p>
+  </footer>
+
   <script>
+    // --- MODAL DE IMAGEM (LIGHTBOX) ---
+    function openImageModal(src) {
+      const modal = document.getElementById('image-modal');
+      const modalImg = document.getElementById('modal-img');
+      modalImg.src = src;
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.classList.add('opacity-100');
+      modalImg.classList.remove('scale-95');
+      modalImg.classList.add('scale-100');
+    }
+
+    function closeImageModal(e, force = false) {
+      if (force || e.target.id === 'image-modal') {
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-img');
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        modalImg.classList.remove('scale-100');
+        modalImg.classList.add('scale-95');
+      }
+    }
+
+    // Fechar Modal com a tecla ESC
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Escape') {
+        closeImageModal(e, true);
+      }
+    });
+
     // --- TRAVAS E BLOQUEIOS DE SEGURANÇA ---
     
     function showForbiddenAlert() {
